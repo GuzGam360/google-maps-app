@@ -7,7 +7,14 @@ import {
   IconButton,
   Input,
   SkeletonText,
-  Text,
+  TableContainer,
+  Text, 
+  Table, 
+  Thead,
+  Th,
+  Tbody,
+  Tr,
+  Td,
 } from '@chakra-ui/react'
 import { FaLocationArrow, FaTimes } from 'react-icons/fa'
 
@@ -20,7 +27,7 @@ import {
 } from '@react-google-maps/api'
 import { useRef, useState } from 'react'
 
-const center = { lat: 48.8584, lng: 2.2945 }
+const center = { lat: 25.67145219760651, lng: -100.31809720508832 }
 
 function App() {
   const { isLoaded } = useJsApiLoader({
@@ -28,15 +35,19 @@ function App() {
     libraries: ['places'],
   })
 
-  const [map, setMap] = useState(/** @type google.maps.Map */ (null))
+  const [map, setMap] = useState(/** @type google.maps.Map */(null))
   const [directionsResponse, setDirectionsResponse] = useState(null)
   const [distance, setDistance] = useState('')
   const [duration, setDuration] = useState('')
+  const [tableData, settableData] = useState([]);
+  let time = duration;
 
   /** @type React.MutableRefObject<HTMLInputElement> */
   const originRef = useRef()
   /** @type React.MutableRefObject<HTMLInputElement> */
   const destiantionRef = useRef()
+
+  console.log({distance, duration});
 
   if (!isLoaded) {
     return <SkeletonText />
@@ -57,6 +68,16 @@ function App() {
     setDirectionsResponse(results)
     setDistance(results.routes[0].legs[0].distance.text)
     setDuration(results.routes[0].legs[0].duration.text)
+
+    // console.log({DestinoUno: originRef.current.value, DestinoDos: destiantionRef.current.value});
+
+    let destinationTable = [
+      originRef.current.value,
+      destiantionRef.current.value,
+      time,
+    ]
+
+    console.log(destinationTable);
   }
 
   function clearRoute() {
@@ -107,14 +128,14 @@ function App() {
         <HStack spacing={2} justifyContent='space-between'>
           <Box flexGrow={1}>
             <Autocomplete>
-              <Input type='text' placeholder='Origin' ref={originRef} />
+              <Input type='text' placeholder='Origen' ref={originRef} />
             </Autocomplete>
           </Box>
           <Box flexGrow={1}>
             <Autocomplete>
               <Input
                 type='text'
-                placeholder='Destination'
+                placeholder='Destino'
                 ref={destiantionRef}
               />
             </Autocomplete>
@@ -122,7 +143,7 @@ function App() {
 
           <ButtonGroup>
             <Button colorScheme='pink' type='submit' onClick={calculateRoute}>
-              Calculate Route
+              Calcular y añadir ruta
             </Button>
             <IconButton
               aria-label='center back'
@@ -132,8 +153,8 @@ function App() {
           </ButtonGroup>
         </HStack>
         <HStack spacing={4} mt={4} justifyContent='space-between'>
-          <Text>Distance: {distance} </Text>
-          <Text>Duration: {duration} </Text>
+          <Text>Distancia: <p>{distance}</p> </Text>
+          <Text>Tiempo: <p>{duration}</p> </Text>
           <IconButton
             aria-label='center back'
             icon={<FaLocationArrow />}
@@ -145,6 +166,39 @@ function App() {
           />
         </HStack>
       </Box>
+
+      <Box
+        mt={600}
+        p={4}
+        borderRadius='lg'
+        bgColor='white'
+        shadow='base'
+        minW='container.md'
+        zIndex='1'>
+          <HStack>
+            <Text>Destinos</Text>
+            <Button>Calcular</Button>
+          </HStack>
+          <TableContainer>
+            <Table variant='simple'>
+              <Thead>
+                <Th>#</Th>
+                <Th>Destino 1</Th>
+                <Th>Destino 2</Th>
+                <Th>Tiempo</Th>
+              </Thead>
+              <Tbody>
+                <Tr>
+                  <Td>1</Td>
+                  <Td>Destino 1</Td>
+                  <Td>Destino 2</Td>
+                  <Td>Tiempo</Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </TableContainer>
+      </Box>
+
     </Flex>
   )
 }
